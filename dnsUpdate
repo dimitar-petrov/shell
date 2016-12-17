@@ -30,5 +30,5 @@ if [[ "$WANIP" == "$CURR_RESOLVE" ]]; then
     _log "IP Resolution is not needed: WANIP: $WANIP EQUALS RESOLVED_IP: $CURR_RESOLVE"
 else
     _log "IPs Differ. Sending update to DNSEXIT API"
-    /usr/bin/wget "http://update.dnsexit.com/RemoteUpdate.sv?login=${USERNAME}&password=${PASSWORD}&host=${HOSTNAME}" > $HTTP_OUT
+    /usr/bin/wget "http://update.dnsexit.com/RemoteUpdate.sv?login=${USERNAME}&password=${PASSWORD}&host=${HOSTNAME}" -O $HTTP_OUT
 fi
