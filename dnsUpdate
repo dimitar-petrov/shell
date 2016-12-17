@@ -1,0 +1,34 @@
+#! /bin/ash
+
+function _log
+{
+    DATE=$(date '+%F %T')
+    MESSAGE=${1}
+
+    printf "%-25s%s\n" "${DATE}:" "${MESSAGE}" >> ${LOG_FILE}
+
+}
+
+# Get Args
+
+USERNAME=${1}
+PASSWORD=${2}
+HOSTNAME=${3}
+
+# LOGFILE
+LOG_FILE='/tmp/root/bin/dnsUpdate.log'
+HTTP_OUT='/tmp/root/bin/dnsexit.http.out'
+
+# Get Current Active IP
+WANIP=$(/sbin/ifconfig ppp0 | awk '/inet addr/ {gsub("addr:", "", $2); print $2}')
+
+# Get current dns resolution
+CURR_RESOLVE=$(/usr/bin/nslookup hrouter.publicvm.com | awk '/^Address / { print $3 }' | tail -1)
+
+# Compare both ip addressses
+if [[ "$WANIP" == "$CURR_RESOLVE" ]]; then
+    _log "IP Resolution is not needed: WANIP: $WANIP EQUALS RESOLVED_IP: $CURR_RESOLVE"
+else
+    _log "IPs Differ. Sending update to DNSEXIT API"
+    /usr/bin/wget "http://update.dnsexit.com/RemoteUpdate.sv?login=${USERNAME}&password=${PASSWORD}&host=${HOSTNAME}" > $HTTP_OUT
+fi
